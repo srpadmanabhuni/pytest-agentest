@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytest-agentest"
+version = "0.1.0"
+description = "pytest plugin for AiEnsured agentest, an Agentic AI Testing platform"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Dr Srinivas Padmanabhuni", email = "srinivas@testaing.com" }]
+keywords = ["pytest", "plugin", "agentest", "agentic-evals", "opentelemetry"]
+classifiers = [
+  "Framework :: Pytest",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Testing",
+]
+dependencies = [
+  "agentest-ai>=3.6.0",
+  "pytest>=7.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/srpadmanabhuni/pytest-agentest"
+Documentation = "https://pypi.org/project/pytest-agentest/"
+Source = "https://github.com/srpadmanabhuni/pytest-agentest"
+
+[project.entry-points.pytest11]
+agentest = "pytest_agentest.plugin"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p pytester"
