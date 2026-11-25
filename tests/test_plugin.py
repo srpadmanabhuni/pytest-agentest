@@ -70,3 +70,24 @@ def test_session_option_without_otlp_is_noop(pytester: pytest.Pytester):
     pytester.makepyfile("def test_ok():\n    assert True\n")
     result = pytester.runpytest("-q")
     result.assert_outcomes(passed=1)
+
+
+def _failing_trace() -> str:
+    """A synthetic trace (copied from agentest's examples/start_here) where T1-018 fails."""
+    from pathlib import Path
+
+    return str(Path(__file__).parent / "fixtures" / "claims-success.otlp.json")
+
+
+def test_strict_fails_session_on_failed_check(pytester: pytest.Pytester):
+    pytester.makepyfile("def test_ok():\n    assert True\n")
+    result = pytester.runpytest("-q", f"--agentest-otlp={_failing_trace()}", "--agentest-ids=T1-018", "--agentest-strict")
+    result.stdout.fnmatch_lines(["*T1-018*fail*"])
+    assert result.ret == pytest.ExitCode.TESTS_FAILED
+
+
+def test_without_strict_failed_check_keeps_exit_zero(pytester: pytest.Pytester):
+    pytester.makepyfile("def test_ok():\n    assert True\n")
+    result = pytester.runpytest("-q", f"--agentest-otlp={_failing_trace()}", "--agentest-ids=T1-018")
+    result.stdout.fnmatch_lines(["*T1-018*fail*"])
+    assert result.ret == pytest.ExitCode.OK
