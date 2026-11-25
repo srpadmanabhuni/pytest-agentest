@@ -101,7 +101,8 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
         return
     ids = session.config.getoption("agentest_ids") or None
     strict = bool(session.config.getoption("agentest_strict"))
-    result = run_agentest(otlp=otlp, ids=ids, fmt="md")
+    # `agentest std run` exits 0 on a failed verdict unless it gets --strict.
+    result = run_agentest(otlp=otlp, ids=ids, fmt="md", extra=["--strict"] if strict else None)
     reporter = session.config.pluginmanager.get_plugin("terminalreporter")
     if reporter is not None:
         reporter.write_line("agentest std run: " + " ".join(result.argv[1:]))
@@ -112,9 +113,6 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
         reporter.write_line(f"agentest exit code: {result.returncode}")
     if strict and result.returncode != 0:
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
-        # pytest may have already finalized exitstatus; also raise via session
-        if exitstatus == 0:
-            session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
 # silence unused-import look; import pytest already used
